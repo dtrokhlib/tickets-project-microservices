@@ -15,6 +15,12 @@ spec:
       containers:
         - name: auth
           image: kyouma337/auth
+          env:
+            - name: jwt
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: jwt
           resources:
             limits:
               memory: '256Mi'
@@ -30,8 +36,7 @@ spec:
   selector:
     app: auth
   ports:
-  - port: 3000
-    targetPort: 3000
-    name: auth
-    protocol: TCP
-
+    - port: 3000
+      targetPort: 3000
+      name: auth
+      protocol: TCP

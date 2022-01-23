@@ -2,16 +2,28 @@ import mongosee from 'mongoose';
 import { IUser, IUserModel, IUserDocument } from './interface/user.interface';
 import { Password } from '../services/password';
 
-const userSchema = new mongosee.Schema({
-  email: {
-    type: String,
-    required: true,
+const userSchema = new mongosee.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  password: {
-    type: String,
-    required: true,
-  },
-});
+  {
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.password;
+        delete ret.__v;
+      },
+    },
+  }
+);
 
 userSchema.statics.build = (fields: IUser) => {
   return new User(fields);
@@ -25,8 +37,6 @@ userSchema.pre('save', async function (done) {
 
   done();
 });
-
-
 
 const User = mongosee.model<IUserDocument, IUserModel>('User', userSchema);
 
