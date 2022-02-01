@@ -12,7 +12,15 @@ build:
       context: auth
       docker:
         dockerfile: Dockerfile
-      sync: 
+      sync:
         manual:
           - dest: .
             src: 'src/**/*.ts'
+    - image: kyouma337/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: '**/*.js'
