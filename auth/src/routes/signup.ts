@@ -2,7 +2,7 @@ import express, { Response, Request } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 
-import { validateRequest } from '../middlewares/validate-request';
+import { validateRequest } from '@kenedi337-tickets/common';
 import { User } from '../models/User';
 
 const router = express.Router();
