@@ -1,7 +1,10 @@
 import express from 'express';
 import cookieSession from 'cookie-session';
-import { errorHandler } from '@kenedi337-tickets/common';
+import { currentUser, errorHandler } from '@kenedi337-tickets/common';
 import { NotFoundError } from '@kenedi337-tickets/common';
+
+import { createTicketRouter } from './routes/new';
+import { showTicketRouter } from './routes/show';
 
 import 'express-async-errors';
 
@@ -14,6 +17,11 @@ app.use(
     secure: process.env.NODE_ENV !== 'test' ? true : false,
   })
 );
+
+app.use(currentUser);
+
+app.use(createTicketRouter);
+app.use(showTicketRouter);
 
 
 app.all('*', async (req, res) => {
