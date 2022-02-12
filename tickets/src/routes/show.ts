@@ -1,14 +1,14 @@
 import { NotFoundError } from '@kenedi337-tickets/common';
-import { Router, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import { Ticket } from '../models/Ticket';
 
-const router = Router();
+const router = express.Router();
 
 router.get('/api/tickets/:id', async (req: Request, res: Response) => {
   const ticket = await Ticket.findById(req.params.id);
-  console.log('MY LOG', req.params, ticket);
+
   if (!ticket) {
-    throw new NotFoundError();
+    return res.status(404).send({ errors: [{ message: 'Not Found' }] });
   }
 
   res.send(ticket);
