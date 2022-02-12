@@ -1,5 +1,4 @@
 import {
-  currentUser,
   DatabaseConnectionError,
   requireAuth,
   validateRequest,
@@ -7,6 +6,8 @@ import {
 import { Router, Request, Response } from 'express';
 import { body } from 'express-validator';
 import { Ticket } from '../models/Ticket';
+import { natsWrapper } from '../nats-wrapper';
+import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
 
 const router = Router();
 
@@ -22,16 +23,22 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const newTicket = Ticket.build({
+    const ticket = Ticket.build({
       ...req.body,
       userId: req.currentUser!.id,
     });
-    if (!newTicket) {
+    if (!ticket) {
       throw new DatabaseConnectionError();
     }
-    await newTicket.save();
+    await ticket.save();
+    await new TicketCreatedPublisher(natsWrapper.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId,
+    });
 
-    res.status(201).send(newTicket);
+    res.status(201).send(ticket);
   }
 );
 

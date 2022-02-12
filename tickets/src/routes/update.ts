@@ -2,11 +2,11 @@ import { Router, Response, Request } from 'express';
 import { body } from 'express-validator';
 import {
   validateRequest,
-  NotFoundError,
   requireAuth,
-  NotAuthorizedError,
 } from '@kenedi337-tickets/common';
 import { Ticket } from '../models/Ticket';
+import { natsWrapper } from '../nats-wrapper';
+import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher';
 
 const router = Router();
 
@@ -28,7 +28,7 @@ router.put(
     if (!ticket) {
       return res.status(404).send({ errors: [{ message: 'Not Found' }] });
     }
-    console.log(ticket.userId, req.currentUser!.id)
+    console.log(ticket.userId, req.currentUser!.id);
     if (ticket.userId !== req.currentUser!.id) {
       return res.status(401).send({ errors: [{ message: 'Not Authorized' }] });
     }
@@ -36,6 +36,12 @@ router.put(
     ticket.title = title;
     ticket.price = price;
     await ticket.save();
+    await new TicketUpdatedPublisher(natsWrapper.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId,
+    });
 
     res.send(ticket);
   }

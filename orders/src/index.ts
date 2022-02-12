@@ -36,13 +36,13 @@ const start = async () => {
     process.on('SIGTERM', () => natsWrapper.client.close());
 
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('[Tickets-project] Tickets service connected to mongodb');
+    console.log('[Tickets-project] Orders service connected to mongodb');
   } catch (err) {
     console.log(err);
   }
 
   app.listen(3000, () => {
-    console.log('[Tickets-project] Tickets service is running on 3000 PORT!');
+    console.log('[Tickets-project] Orders service is running on 3000 PORT!');
   });
 };
 
