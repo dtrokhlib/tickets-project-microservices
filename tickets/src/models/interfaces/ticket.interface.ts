@@ -10,6 +10,8 @@ export interface ITicketDocument extends mongoose.Document {
   title: string;
   price: number;
   userId: string;
+  version: number;
+  orderId?: string;
 }
 
 export interface ITicketModel extends mongoose.Model<ITicketDocument> {

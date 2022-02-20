@@ -1,5 +1,6 @@
 import { OrderStatus } from '@kenedi337-tickets/common';
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import {
   ITicket,
   ITicketDocument,
@@ -29,8 +30,19 @@ const ticketSchema = new mongoose.Schema(
   }
 );
 
+ticketSchema.set('versionKey', 'version');
+ticketSchema.plugin(updateIfCurrentPlugin);
+
+ticketSchema.statics.findByEvent = (event: { id: string, version: number}) => {
+  return Ticket.findOne({ _id: event.id, version: event.version - 1 });
+}
+
 ticketSchema.statics.build = (fields: ITicket) => {
-  return new Ticket(fields);
+  return new Ticket({
+    _id: fields.id,
+    title: fields.title,
+    price: fields.price,
+  });
 };
 
 ticketSchema.methods.isReserved = async function () {

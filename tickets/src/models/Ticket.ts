@@ -4,6 +4,7 @@ import {
   ITicketModel,
   ITicketDocument,
 } from './interfaces/ticket.interface';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 const ticketSchema = new mongosee.Schema(
   {
@@ -19,6 +20,9 @@ const ticketSchema = new mongosee.Schema(
       type: String,
       required: true,
     },
+    orderId: {
+      type: String,
+    },
   },
   {
     toJSON: {
@@ -30,6 +34,9 @@ const ticketSchema = new mongosee.Schema(
     },
   }
 );
+
+ticketSchema.set('versionKey', 'version');
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 ticketSchema.statics.build = (fields: ITicket) => {
   return new Ticket(fields);

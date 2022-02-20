@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 import { app } from './app';
+import { ExpirationCompleteListener } from './events/listeners/expiration-complete-listener';
+import { TickedCreatedListener } from './events/listeners/ticket-created-listener';
+import { TickedUpdatedListener } from './events/listeners/ticket-updated-listener';
 import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
@@ -34,6 +37,10 @@ const start = async () => {
     });
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
+
+    new TickedCreatedListener(natsWrapper.client).listen();
+    new TickedUpdatedListener(natsWrapper.client).listen();
+    new ExpirationCompleteListener(natsWrapper.client).listen();
 
     await mongoose.connect(process.env.MONGO_URI);
     console.log('[Tickets-project] Orders service connected to mongodb');

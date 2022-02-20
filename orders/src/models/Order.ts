@@ -5,6 +5,7 @@ import {
   IOrderDocument,
   IOrderModel,
 } from './interfaces/order.interface';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 const orderSchema = new mongoose.Schema(
   {
@@ -35,6 +36,9 @@ const orderSchema = new mongoose.Schema(
     },
   }
 );
+
+orderSchema.set('versionKey', 'version');
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (fields: IOrder) => {
   return new Order(fields);
